@@ -45,7 +45,8 @@ to do this your need to indicate Params arguments like :
 PathToYourInputFile numberOfPageRankingTurn
 /home/user/document/input.txt 4
 ```
-* Otherwise you can use the JAR file with Hadoop library like 
+* Otherwise you can use the JAR file from _/target/hadoop.*.jar_ with Hadoop library like :
+
 (remember that _mvn install_ import the hadoop library, so execution under the ide is more easy) 
 
 The program take to argument :
@@ -55,5 +56,5 @@ The program take to argument :
 
 In a terminal launch : 
 ```
-./PathToHadoopLibrary/bin/hadoop.sh jar PathtoHadoopPageRank/ PageRankMapReduce PathToInputFile numberOfPageRankTurn
+./PathToHadoopLibrary/bin/hadoop.sh jar PathtoHadoopPageRank/target/hadoop.*.jar PageRankMapReduce PathToInputFile numberOfPageRankTurn
 ```
