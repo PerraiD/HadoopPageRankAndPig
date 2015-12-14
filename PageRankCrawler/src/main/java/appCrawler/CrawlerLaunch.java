@@ -1,6 +1,7 @@
 package appCrawler;
 
-import crawler.LargeScaleCrawler;
+import crawler.HadoopLargeScaleCrawler;
+import crawler.PigLargeScaleCrawler;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
@@ -20,7 +21,7 @@ public class CrawlerLaunch {
 
 
 		String crawlStorageFolder = System.getProperty("user.dir") + "/_temp/";
-		int numberOfCrawlers = 7;
+		int numberOfCrawlers = 8;
 
 		CrawlConfig config = new CrawlConfig();
 		config.setCrawlStorageFolder(crawlStorageFolder);
@@ -49,7 +50,15 @@ public class CrawlerLaunch {
 			 */
             System.out.println("Crawler is running");
 
-            controller.start(LargeScaleCrawler.class, numberOfCrawlers);
+
+
+            if(args[2].toLowerCase().equals("pig")) {
+                controller.start(PigLargeScaleCrawler.class, numberOfCrawlers);
+
+            }else if(args[2].toLowerCase().toLowerCase().equals("hadoop")){
+                controller.start(HadoopLargeScaleCrawler.class,numberOfCrawlers);
+            }
+
 
 
             File file = new File(System.getProperty("user.dir")
@@ -64,7 +73,13 @@ public class CrawlerLaunch {
 
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(LargeScaleCrawler.outputLines);
+            if(args[2].toLowerCase().equals("pig")) {
+                bw.write(PigLargeScaleCrawler.outputLines);
+
+            }else if(args[2].toLowerCase().toLowerCase().equals("hadoop")){
+                bw.write(HadoopLargeScaleCrawler.outputLines);
+            }
+
 			bw.close();
 			System.out.println("Task done");
 		} catch (Exception e) {

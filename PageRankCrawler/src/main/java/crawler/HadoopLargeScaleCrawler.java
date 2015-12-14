@@ -7,7 +7,7 @@ import edu.uci.ics.crawler4j.url.WebURL;
 
 import java.util.Set;
 
-public class LargeScaleCrawler extends WebCrawler {
+public class HadoopLargeScaleCrawler extends WebCrawler {
 
 	public static String outputLines = "";
 
@@ -24,8 +24,8 @@ public class LargeScaleCrawler extends WebCrawler {
 			Boolean first = true;
 
 			outputLines += url;
-
-			// rank set to 1
+            System.out.println(url);
+            // rank set to 1
 			outputLines += "\t1\t";
 			// // nb of outgoing link
 			// outputLines += " " + links.size() + " ";
@@ -40,6 +40,7 @@ public class LargeScaleCrawler extends WebCrawler {
 				}
 
 			}
+            outputLines.replace("\n","");
 			outputLines += "\n";
 		}
 	}

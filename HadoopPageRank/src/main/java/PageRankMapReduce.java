@@ -23,8 +23,15 @@ public class PageRankMapReduce {
 			int pageTabIndex = value.find("\t");
 			int rankTabIndex = value.find("\t", pageTabIndex + 1);
 
+            System.out.println(pageTabIndex);
+            //dans le cas ou il y'aurai une ligne vide dans le fichier
+            if(pageTabIndex == -1){
+               return;
+            }
+
 			// on récupère la page extraite
 			String page = Text.decode(value.getBytes(), 0, pageTabIndex);
+
 			// la page + le page rank
 			String pageWithRank = Text.decode(value.getBytes(), 0,
 					rankTabIndex + 1);
@@ -32,10 +39,6 @@ public class PageRankMapReduce {
 			// on marque la page comme existante
 			context.write(new Text(page), new Text("!"));
 
-			// on évite les pages qui n'ont pas de lien (=> pas de page rank)
-			if (rankTabIndex == -1) {
-				return;
-			}
 			// on récupère la liste des liens
 			String links = Text.decode(value.getBytes(), rankTabIndex + 1,
 					value.getLength() - (rankTabIndex + 1));
@@ -58,7 +61,7 @@ public class PageRankMapReduce {
 
 	public static class PageRankReducer extends Reducer<Text, Text, Text, Text> {
 
-		private static final float radomSurfer = 0.85F;
+		private static final float randomSurfer = 0.85F;
 
 		@Override
 		public void reduce(Text page, Iterable<Text> values, Context context)
@@ -82,7 +85,7 @@ public class PageRankMapReduce {
 					continue;
 				}
 
-				split = pageWithRank.split("\\t");
+				split = pageWithRank.split("\t");
 
 				float pageRank = Float.valueOf(split[1]);
 				int nbOutLink = Integer.valueOf(split[2]);
@@ -93,7 +96,7 @@ public class PageRankMapReduce {
 			if (!isExistingPage) {
 				return;
 			}
-			float newRank = (radomSurfer * participantRank) + (1 - radomSurfer);
+			float newRank = (randomSurfer * participantRank) + (1 - randomSurfer);
 
 			context.write(page, new Text(newRank + links));
 		}
