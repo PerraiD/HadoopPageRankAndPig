@@ -15,26 +15,27 @@ public class PigPageRank
             PigServer pigServer = new PigServer(ExecType.LOCAL);
 
             // we parse each line to provide a type to each row elements
-//            pigServer.registerQuery("currentPageRank =" +
-//                    "  LOAD '"+args[0]+"' " +
-//                    "  USING PigStorage('\\t')" +
-//                    "  AS ( url: chararray, pagerank: float, links: chararray );");
-
-
             pigServer.registerQuery("currentPageRank =" +
                     "  LOAD '"+args[0]+"' " +
                     "  USING PigStorage('\\t')" +
-                    "  AS ( url: chararray, pagerank: float, links:{ link: ( url: chararray ) });");
+                    "  AS ( url: chararray, pagerank: float, links: chararray );");
 
-            pigServer.dumpSchema("currentPageRank");
+//
+//            pigServer.registerQuery("currentPageRank =" +
+//                    "  LOAD '"+args[0]+"' " +
+//                    "  USING PigStorage('\\t')" +
+//                    "  AS ( url: chararray, pagerank: float, links:{ link: ( url: chararray ) });");
+//
+//            pigServer.dumpSchema("currentPageRank");
 
-//            //we split the links to be an array of links and be countable
-//            pigServer.registerQuery("currentPageRank  = "+
-//                    "FOREACH currentPageRank  " +
-//                    "GENERATE url, pagerank, TOKENIZE(links,',') AS links:{link:tuple(url:chararray)} ;"
-//
-//
-//            );
+            //we split the links to be an array of links and be countable
+            pigServer.registerQuery("currentPageRank  = "+
+                    "FOREACH currentPageRank  " +
+                    "GENERATE url, pagerank, TOKENIZE(links,',') AS links:{link:tuple(url:chararray)}," +
+                    "links AS originalLinks ;"
+
+
+            );
 
             pigServer.dumpSchema("currentPageRank");
 
@@ -52,24 +53,21 @@ public class PigPageRank
                     "FOREACH " +
                     "( COGROUP outlinkPageRank BY to_url, currentPageRank BY url INNER )" +
                     "GENERATE " +
-                    "group AS url, " +
+                    "FLATTEN (currentPageRank.url)," +
                     "( 1.0 - 0.85 ) + 0.85 * SUM ( outlinkPageRank.pagerank ) AS pagerank, " +
-                    "FLATTEN ( currentPageRank.links ) AS links;");
-
-//            pigServer.registerQuery(" newPageRank =" +
-//                    "FOREACH  newPageRank " +
-//                    "GENERATE url, pagerank, FLATTEN (links) as links;");
-//
-//            pigServer.registerQuery(" newPageRank =" +
-//                    "FOREACH  newPageRank " +
-//                    "GENERATE url, pagerank, FLATTEN (links) as links;");
+                    "FLATTEN (currentPageRank.originalLinks);");
 
 
             pigServer.dumpSchema("newPageRank");
 
 
             //we get the new calculate page rank in a outputfile (named  part-m-00000)
-            pigServer.store("currentPageRank", System.getProperty("user.dir")+"/output/pagerank3");
+            pigServer.registerQuery("STORE newPageRank " +
+                    "INTO '"+System.getProperty("user.dir")+"/output/pagerank'"+
+                    "USING PigStorage('\\t');"
+            );
+
+
 
         } catch (IOException e) {
             e.printStackTrace();
