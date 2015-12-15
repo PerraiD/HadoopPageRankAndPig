@@ -23,7 +23,6 @@ public class PageRankMapReduce {
 			int pageTabIndex = value.find("\t");
 			int rankTabIndex = value.find("\t", pageTabIndex + 1);
 
-            System.out.println(pageTabIndex);
             //dans le cas ou il y'aurai une ligne vide dans le fichier
             if(pageTabIndex == -1){
                return;
